@@ -1,8 +1,8 @@
 {
   "type": "panel",
-  "name": "Graph Panel Template",
+  "name": "Graph Math Panel Template",
 
-  "id": "something-else-graph-panel",
+  "id": "something-else-graph-panel-test",
 
   "info": {
     "author": {
