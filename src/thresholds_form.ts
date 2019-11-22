@@ -1,4 +1,3 @@
-
 import coreModule from 'grafana/app/core/core_module';
 
 export class ThresholdFormCtrl {
@@ -128,7 +127,7 @@ var template = `
 </div>
 `;
 
-coreModule.directive('graphPanelThresholdForm', function() {
+coreModule.directive('multibarGraphPanelThresholdForm', function() {
   return {
     restrict: 'E',
     template: template,

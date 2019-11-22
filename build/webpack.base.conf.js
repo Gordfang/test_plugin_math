@@ -1,5 +1,4 @@
 const path = require('path');
-const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 function resolve(dir) {
@@ -11,13 +10,13 @@ module.exports = {
   context: resolve('src'),
   entry: './module.ts',
   output: {
-    filename: "module.js",
+    filename: 'module.js',
     path: resolve('dist'),
-    libraryTarget: "amd"
+    libraryTarget: 'amd'
   },
   externals: [
     // remove the line below if you don't want to use buildin versions
-    'jquery', 'lodash', 'moment', 'angular',
+    'lodash', 'moment', 'angular',
     function(context, request, callback) {
       var prefix = 'grafana/';
       if (request.indexOf(prefix) === 0) {
@@ -27,24 +26,31 @@ module.exports = {
     }
   ],
   plugins: [
-    new webpack.optimize.OccurrenceOrderPlugin(),
     new CopyWebpackPlugin([
       { from: 'plugin.json' },
       { from: 'img/*' },
-      { from: 'partials/*' }
+      { from: 'screenshots/*' },
+      { from: 'partials/*' },
+      { from: '../README.md' }
     ])
   ],
   resolve: {
-    extensions: [".ts", ".js"]
+    extensions: ['.ts', '.js']
   },
   module: {
     rules: [
       {
-        test: /\.tsx?$/, 
+        test: /\.ts$/, 
         loaders: [
-          "ts-loader"
+          'ts-loader'
         ],
         exclude: /node_modules/,
+      },
+      {
+        test: /jquery\.flot/,
+        loaders: [
+          'imports-loader?jQuery=jquery,lodash=lodash,angular=angular,tetherDrop=tether-drop'
+        ]
       }
     ]
   }

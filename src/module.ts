@@ -1,6 +1,6 @@
 
-import './graph';
-import './legend';
+import { GraphRenderer } from './graph_renderer';
+import { GraphLegend } from './graph_legend';
 import './series_overrides_ctrl';
 import './thresholds_form';
 
@@ -10,6 +10,8 @@ import config from 'grafana/app/core/config';
 import { MetricsPanelCtrl, alertTab } from 'grafana/app/plugins/sdk';
 import { DataProcessor } from './data_processor';
 import { axesEditorComponent } from './axes_editor';
+
+import $ from 'jquery';
 
 class GraphCtrl extends MetricsPanelCtrl {
   static template = template;
@@ -27,6 +29,9 @@ class GraphCtrl extends MetricsPanelCtrl {
   colors: any = [];
   subTabIndex: number;
   processor: DataProcessor;
+
+  private _graphRenderer: GraphRenderer;
+  private _graphLegend: GraphLegend;
 
   panelDefaults = {
     // datasource name, null = default datasource
@@ -57,6 +62,8 @@ class GraphCtrl extends MetricsPanelCtrl {
       name: null,
       values: [],
       buckets: null,
+      customDateFormatShow: false,
+      customDateFormat: ''
     },
     // show/hide lines
     lines: true,
@@ -110,11 +117,20 @@ class GraphCtrl extends MetricsPanelCtrl {
     // other style overrides
     seriesOverrides: [],
     thresholds: [],
+    displayBarsSideBySide: false,
+    labelAlign: 'left'
   };
 
   /** @ngInject */
-  constructor($scope, $injector, private annotationsSrv) {
+  constructor($scope, $injector, private annotationsSrv, private popoverSrv, private contextSrv) {
     super($scope, $injector);
+
+    // hack to show alert threshold
+    // visit link to find out why
+    // https://github.com/grafana/grafana/blob/master/public/app/features/alerting/threshold_mapper.ts#L3
+    // should make it 'corpglory-multibar-graph-panel' before save
+    // https://github.com/CorpGlory/grafana-multibar-graph-panel/issues/6#issuecomment-377238048
+    // this.panel.type='graph';
     
     _.defaults(this.panel, this.panelDefaults);
     _.defaults(this.panel.tooltip, this.panelDefaults.tooltip);
@@ -129,6 +145,15 @@ class GraphCtrl extends MetricsPanelCtrl {
     this.events.on('data-snapshot-load', this.onDataSnapshotLoad.bind(this));
     this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
     this.events.on('init-panel-actions', this.onInitPanelActions.bind(this));
+  }
+
+  link(scope, elem, attrs, ctrl) {
+    var $graphElem = $(elem[0]).find('#multibar-graph-panel');
+    var $legendElem = $(elem[0]).find('#multibar-graph-legend');
+    this._graphRenderer = new GraphRenderer(
+      $graphElem, this.timeSrv, this.contextSrv, this.$scope
+    );
+    this._graphLegend = new GraphLegend($legendElem, this.popoverSrv, this.$scope);
   }
 
   onInitEditMode() {
@@ -220,7 +245,7 @@ class GraphCtrl extends MetricsPanelCtrl {
     );
   }
 
-  onRender() {
+  onRender(data) {
     if (!this.seriesList) {
       return;
     }
@@ -232,6 +257,11 @@ class GraphCtrl extends MetricsPanelCtrl {
         this.panel.yaxes[series.yaxis - 1].format = series.unit;
       }
     }
+
+    this._graphRenderer.render(data);
+    this._graphLegend.render();
+
+    this._graphRenderer.renderPanel();
   }
 
   changeSeriesColor(series, color) {
@@ -287,7 +317,7 @@ class GraphCtrl extends MetricsPanelCtrl {
   }
 
   toggleAxis(info) {
-    var override = _.find(this.panel.seriesOverrides, { alias: info.alias });
+    var override: any = _.find(this.panel.seriesOverrides, { alias: info.alias });
     if (!override) {
       override = { alias: info.alias };
       this.panel.seriesOverrides.push(override);
@@ -328,7 +358,7 @@ class GraphCtrl extends MetricsPanelCtrl {
 
   get panelPath() {
     if (this._panelPath === undefined) {
-      this._panelPath = '/public/plugins/' + this.pluginId + '/';
+      this._panelPath = './public/plugins/' + this.pluginId + '/';
     }
     return this._panelPath;
   }
