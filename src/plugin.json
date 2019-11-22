@@ -1,26 +1,21 @@
 {
   "type": "panel",
-  "name": "Simple Angular",
-  "id": "simple-angular-panel",
+  "name": "Graph Panel Template",
+
+  "id": "something-else-graph-panel",
 
   "info": {
-    "description": "Simple Angular Panel",
     "author": {
-      "name": "Grafana Labs"
+      "name": "Grafana Project",
+      "url": "https://grafana.com"
     },
-    "keywords": [ "discrete", "events", "strings" ],
     "logos": {
-      "small": "img/logo.svg",
-      "large": "img/logo.svg"
-    },
-    "links": [],
-    "screenshots": [],
-    "version": "%VERSION%",
-    "updated": "%TODAY%"
+      "small": "img/icn-graph-panel.svg",
+      "large": "img/icn-graph-panel.svg"
+    }
   },
-
   "dependencies": {
-    "grafanaVersion": "6.3.x",
-    "plugins": [ ]
+    "grafanaVersion": "4.6.x"
   }
 }
+
