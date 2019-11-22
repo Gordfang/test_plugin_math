@@ -11,7 +11,7 @@
       "url": "http://localhost:3000/d/<hash>/<your-dashboard>",
       "sourceMaps": true,
       "pathMapping": {
-        "/public/plugins/something-else-graph-panel": "${workspaceFolder}/dist"
+        "/var/lib/grafana/plugins/something-else-graph-panel": "${workspaceFolder}/dist"
       },
       "webRoot": "${workspaceFolder}",
       "sourceMapPathOverrides": {

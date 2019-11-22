@@ -83,7 +83,7 @@ export function axesEditorComponent() {
   return {
     restrict: 'E',
     scope: true,
-    templateUrl: 'public/plugins/something-else-graph-panel/partials/axes_editor.html',
+    templateUrl: '/var/lib/grafana/plugins/something-else-graph-panel/partials/axes_editor.html',
     controller: AxesEditorCtrl,
   };
 }
