@@ -139,7 +139,7 @@ export class GraphRenderer {
     if (!this.data) {
       return;
     }
-    renderData = this._addCalculLine(renderData);
+    this._addCalculLine();
 
     // this.annotations = this.ctrl.annotations || [];
     this._buildFlotPairs(this.data);
@@ -292,28 +292,59 @@ export class GraphRenderer {
     }
   }
 
-  private _addCalculLine(renderData) {
-    let series1 = renderData[0];
-    let series2 = renderData[1];
-    let series3 = JSON.parse(JSON.stringify(series1));
-    series3.alias = "Calcul-series";
-    series3.aliasEscaped = "Calcul-series";
-    series3.id = "Calcul-series";
-    series3.label = "Calcul-series";
-    series3.color = "#FFFFFF";
-    series3.valueFormater = series1.valueFormater;
-    series3.stats = series1.stats;
-    series3.unit = series1.unit;
-    Object.setPrototypeOf(series3, Object.getPrototypeOf(series1));
-    series3.data = [];
-    Object.keys(series3.datapoints).forEach(key => {
-        series3.datapoints[key][0] = series1.datapoints[key][0] - series2.datapoints[key][0];
-        series3.data[key] = [];
-        series3.data[key][0] = series3.datapoints[key][1];
-        series3.data[key][1] = series3.datapoints[key][0];
+  private _addCalculLine() {
+    if (this.panel.calcul.alias1 != null && this.panel.calcul.alias2 != null) {
+      let addSeries = false;
+      let series1 = null;
+      let series2 = null;
+      let series3 = null;
+      for (let data of this.data) {
+        if (data.alias === this.panel.calcul.alias1) {
+          series1 = data;
+        } else if (data.alias === this.panel.calcul.alias2) {
+          series2 = data;
+        } else if (data.alias === 'Calcul-series') {
+          series3 = data;
+        }
       }
-    );
-    renderData.push(series3);
+      if (series1 != null && series2 != null) {
+        if (series3 == null) {
+          addSeries = true;
+          series3 = JSON.parse(JSON.stringify(series1));
+        }
+        series3.alias = "Calcul-series";
+        series3.aliasEscaped = "Calcul-series";
+        series3.id = "Calcul-series";
+        series3.label = "Calcul-series";
+        series3.color = '#' + this.panel.calcul.color;
+        Object.setPrototypeOf(series3, Object.getPrototypeOf(series1));
+
+        series3.data = [];
+        Object.keys(series3.datapoints).forEach(key => {
+          switch (this.panel.calcul.operation) {
+            case "%":
+              if (series2.datapoints[key][0] == 0 || series1.datapoints[key][0] == 0) {
+                series3.datapoints[key][0] = 0;
+              } else {
+                series3.datapoints[key][0] = (series2.datapoints[key][0] / series1.datapoints[key][0]) * 100;
+              }
+              break;
+            case "+":
+              series3.datapoints[key][0] = series2.datapoints[key][0] + series1.datapoints[key][0];
+              break;
+            case "-":
+              series3.datapoints[key][0] = series1.datapoints[key][0] - series2.datapoints[key][0];
+              break;
+          }
+          series3.data[key] = [];
+          series3.data[key][0] = series3.datapoints[key][1];
+          series3.data[key][1] = series3.datapoints[key][0];
+        });
+        if (addSeries) {
+          this.data.push(series3);
+        }
+      }
+    }
   }
 
   private _prepareXAxis(panel) {

@@ -122,7 +122,8 @@ class GraphCtrl extends MetricsPanelCtrl {
     calcul: {
       alias1: null,
       alias2: null,
-      operation: '%'
+      operation: '%',
+      color: 'FFFFFF'
     }
   };
 
@@ -141,6 +142,7 @@ class GraphCtrl extends MetricsPanelCtrl {
     _.defaults(this.panel.tooltip, this.panelDefaults.tooltip);
     _.defaults(this.panel.legend, this.panelDefaults.legend);
     _.defaults(this.panel.xaxis, this.panelDefaults.xaxis);
+    _.defaults(this.panel.calcul, this.panelDefaults.calcul);
 
     this.processor = new DataProcessor(this.panel);
 
