@@ -121,7 +121,6 @@ export class GraphRenderer {
       appEvents.emit('graph-hover-clear');
     });
 
-
     this.$elem.bind("plothover", (event, pos, item) => {
       this.tooltip.show(pos, item);
       pos.panelRelY = (pos.pageY - this.$elem.offset().top) / this.$elem.height();
@@ -140,6 +139,8 @@ export class GraphRenderer {
     if (!this.data) {
       return;
     }
+    renderData = this._addCalculLine(renderData);
+
     // this.annotations = this.ctrl.annotations || [];
     this._buildFlotPairs(this.data);
     updateLegendValues(this.data, this.panel);
@@ -289,6 +290,30 @@ export class GraphRenderer {
         series.stack = false;
       }
     }
+  }
+
+  private _addCalculLine(renderData) {
+    let series1 = renderData[0];
+    let series2 = renderData[1];
+    let series3 = JSON.parse(JSON.stringify(series1));
+    series3.alias = "Calcul-series";
+    series3.aliasEscaped = "Calcul-series";
+    series3.id = "Calcul-series";
+    series3.label = "Calcul-series";
+    series3.color = "#FFFFFF";
+    series3.valueFormater = series1.valueFormater;
+    series3.stats = series1.stats;
+    series3.unit = series1.unit;
+    Object.setPrototypeOf(series3, Object.getPrototypeOf(series1));
+    series3.data = [];
+    Object.keys(series3.datapoints).forEach(key => {
+        series3.datapoints[key][0] = series1.datapoints[key][0] - series2.datapoints[key][0];
+        series3.data[key] = [];
+        series3.data[key][0] = series3.datapoints[key][1];
+        series3.data[key][1] = series3.datapoints[key][0];
+      }
+    );
+    renderData.push(series3);
   }
 
   private _prepareXAxis(panel) {
@@ -485,7 +510,7 @@ export class GraphRenderer {
 
     let ticks: any = this.panelWidth / 100;
     console.log('Sorted series length: ', this.sortedSeries.length);
-    
+
     if(this.panel.bars && this.sortedSeries.length > 0 && this.sortedSeries[0].datapoints.length > 0) {
       console.log('First serie alias: ', this.sortedSeries[0].alias);
       let groupsAmount = (max - min) / minTimeStep;
@@ -498,7 +523,7 @@ export class GraphRenderer {
         } else {
           format = this._timeFormat(generatedTicks, min, max);
         }
-        
+
         const formatDate = ($.plot as any).formatDate;
         ticks = _.map(generatedTicks, tick => {
           const secondsInMinute = 60;
@@ -539,9 +564,9 @@ export class GraphRenderer {
 
     const shiftedRangeFrom = rangeFrom - this.flotOptions.series.bars.barWidth;
     const shiftedRangeTo = rangeTo + this.flotOptions.series.bars.barWidth;
-    let seriesInRange = _.map(this.sortedSeries, (serie: any) => 
+    let seriesInRange = _.map(this.sortedSeries, (serie: any) =>
       serie.datapoints.filter(
-        datapoint => 
+        datapoint =>
           datapoint[1] >= shiftedRangeFrom && datapoint[1] <= shiftedRangeTo
       )
     );

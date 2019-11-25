@@ -118,7 +118,12 @@ class GraphCtrl extends MetricsPanelCtrl {
     seriesOverrides: [],
     thresholds: [],
     displayBarsSideBySide: false,
-    labelAlign: 'left'
+    labelAlign: 'left',
+    calcul: {
+      alias1: null,
+      alias2: null,
+      operation: '%'
+    }
   };
 
   /** @ngInject */
@@ -131,7 +136,7 @@ class GraphCtrl extends MetricsPanelCtrl {
     // should make it 'corpglory-multibar-graph-panel' before save
     // https://github.com/CorpGlory/grafana-multibar-graph-panel/issues/6#issuecomment-377238048
     // this.panel.type='graph';
-    
+
     _.defaults(this.panel, this.panelDefaults);
     _.defaults(this.panel.tooltip, this.panelDefaults.tooltip);
     _.defaults(this.panel.legend, this.panelDefaults.legend);
