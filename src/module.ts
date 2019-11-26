@@ -120,8 +120,6 @@ class GraphCtrl extends MetricsPanelCtrl {
     displayBarsSideBySide: false,
     labelAlign: 'left',
     calcul: {
-      alias1: null,
-      alias2: null,
       operation: '%',
       color: 'FFFFFF',
       name: 'Calcul-series',

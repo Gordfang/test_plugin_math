@@ -293,67 +293,72 @@ export class GraphRenderer {
   }
 
   private _addCalculLine() {
-    console.log(this.data);
     if (this.panel.calcul.alias1 != null && this.panel.calcul.alias2 != null) {
-      let addSeries = false;
-      let series1 = null;
-      let series1Key = null;
-      let series2 = null;
-      let series2Key = null;
-      let series3 = null;
-      Object.keys(this.data).forEach(key => {
-        let data = this.data[key];
-        switch (data.alias) {
-          case this.panel.calcul.alias1:
-            series1 = data;
-            series1Key = key;
-            break;
-          case this.panel.calcul.alias2:
-            series2 = data;
-            series2Key = key;
-            break;
-          case this.panel.calcul.name:
-            series3 = data;
-            break;
-          default:
-            break;
-        }
-      });
-      if (series1 != null && series2 != null) {
-        if (series3 == null) {
-          addSeries = true;
-          series3 = JSON.parse(JSON.stringify(series1));
-        }
-        series3.alias = this.panel.calcul.name;
-        series3.aliasEscaped = this.panel.calcul.name;
-        series3.id = this.panel.calcul.name;
-        series3.label = this.panel.calcul.name;
-        series3.color = '#' + this.panel.calcul.color;
-        Object.setPrototypeOf(series3, Object.getPrototypeOf(series1));
+      const regex = /\{[^}]*\}/g;
+      let seriesMatch = this.panel.calcul.operation.match(regex);
 
-        series3.data = [];
-        Object.keys(series3.datapoints).forEach(key => {
-          switch (this.panel.calcul.operation) {
-            case "%":
-              if (series2.datapoints[key][0] == 0 || series1.datapoints[key][0] == 0) {
-                series3.datapoints[key][0] = 0;
-              } else {
-                series3.datapoints[key][0] = ((series2.datapoints[key][0] / (series2.datapoints[key][0] + series1.datapoints[key][0])) * 100);
-              }
-              break;
-            case "+":
-              series3.datapoints[key][0] = series2.datapoints[key][0] + series1.datapoints[key][0];
-              break;
-            case "-":
-              series3.datapoints[key][0] = series1.datapoints[key][0] - series2.datapoints[key][0];
-              break;
+      if (seriesMatch !== null) {
+        let cloneAlias = null;
+        let newSeries = null;
+        let series = {};
+        Object.keys(this.data).forEach(key => {
+          let data = this.data[key];
+          let alias = '{' + data.alias + '}';
+          if (seriesMatch.indexOf(alias) > -1) {
+            series[alias] = data;
+            cloneAlias = alias;
           }
-          series3.data[key] = [];
-          series3.data[key][0] = series3.datapoints[key][1];
-          series3.data[key][1] = series3.datapoints[key][0];
+          if (this.panel.calcul.name === data.alias) {
+            newSeries = data;
+          }
         });
-        if (addSeries) {
-          this.data.push(series3);
+
+        if (Object.keys(series).length <= Object.keys(seriesMatch).length) {
+          let addSeries = false;
+          if (newSeries == null) {
+            addSeries = true;
+            newSeries = JSON.parse(JSON.stringify(series[cloneAlias]));
+          }
+          newSeries.alias = this.panel.calcul.name;
+          newSeries.aliasEscaped = this.panel.calcul.name;
+          newSeries.id = this.panel.calcul.name;
+          newSeries.label = this.panel.calcul.name;
+          newSeries.color = '#' + this.panel.calcul.color;
+          Object.setPrototypeOf(newSeries, Object.getPrototypeOf(series[cloneAlias]));
+
+          newSeries.data = [];
+          Object.keys(newSeries.datapoints).forEach(keyDatapoints => {
+            let operation = this.panel.calcul.operation;
+            seriesMatch.forEach(value => {
+              operation = operation.replace(value, series[value].datapoints[keyDatapoints][0]);
+            });
+            try {
+              newSeries.datapoints[keyDatapoints][0] = eval(operation);
+            } catch (error) {
+              console.log("Operation not valid");
+            }
+
+            newSeries.data[keyDatapoints] = [];
+            newSeries.data[keyDatapoints][0] = newSeries.datapoints[keyDatapoints][1];
+            newSeries.data[keyDatapoints][1] = newSeries.datapoints[keyDatapoints][0];
+          });
+          if (addSeries) {
+            this.data.push(newSeries);
+          }
+          if (!this.panel.calcul.show) {
+            let keyDelete = [];
+            Object.keys(this.data).forEach(keyData => {
+              Object.keys(series).forEach(key => {
+                if ('{' + this.data[keyData].alias + '}' === key) {
+                  keyDelete.push(keyData);
+                }
+              });
+            });
+            keyDelete.sort((one, two) => (one > two ? -1 : 1));
+            keyDelete.forEach(value => {
+              this.data.splice(value, 1);
+            });
+          }
         }
       }
     }
