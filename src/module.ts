@@ -123,7 +123,9 @@ class GraphCtrl extends MetricsPanelCtrl {
       alias1: null,
       alias2: null,
       operation: '%',
-      color: 'FFFFFF'
+      color: 'FFFFFF',
+      name: 'Calcul-series',
+      show: true
     }
   };
 

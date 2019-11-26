@@ -293,29 +293,41 @@ export class GraphRenderer {
   }
 
   private _addCalculLine() {
+    console.log(this.data);
     if (this.panel.calcul.alias1 != null && this.panel.calcul.alias2 != null) {
       let addSeries = false;
       let series1 = null;
+      let series1Key = null;
       let series2 = null;
+      let series2Key = null;
       let series3 = null;
-      for (let data of this.data) {
-        if (data.alias === this.panel.calcul.alias1) {
-          series1 = data;
-        } else if (data.alias === this.panel.calcul.alias2) {
-          series2 = data;
-        } else if (data.alias === 'Calcul-series') {
-          series3 = data;
+      Object.keys(this.data).forEach(key => {
+        let data = this.data[key];
+        switch (data.alias) {
+          case this.panel.calcul.alias1:
+            series1 = data;
+            series1Key = key;
+            break;
+          case this.panel.calcul.alias2:
+            series2 = data;
+            series2Key = key;
+            break;
+          case this.panel.calcul.name:
+            series3 = data;
+            break;
+          default:
+            break;
         }
-      }
+      });
       if (series1 != null && series2 != null) {
         if (series3 == null) {
           addSeries = true;
           series3 = JSON.parse(JSON.stringify(series1));
         }
-        series3.alias = "Calcul-series";
-        series3.aliasEscaped = "Calcul-series";
-        series3.id = "Calcul-series";
-        series3.label = "Calcul-series";
+        series3.alias = this.panel.calcul.name;
+        series3.aliasEscaped = this.panel.calcul.name;
+        series3.id = this.panel.calcul.name;
+        series3.label = this.panel.calcul.name;
         series3.color = '#' + this.panel.calcul.color;
         Object.setPrototypeOf(series3, Object.getPrototypeOf(series1));
 
@@ -326,7 +338,7 @@ export class GraphRenderer {
               if (series2.datapoints[key][0] == 0 || series1.datapoints[key][0] == 0) {
                 series3.datapoints[key][0] = 0;
               } else {
-                series3.datapoints[key][0] = (series2.datapoints[key][0] / series1.datapoints[key][0]) * 100;
+                series3.datapoints[key][0] = ((series2.datapoints[key][0] / (series2.datapoints[key][0] + series1.datapoints[key][0])) * 100);
               }
               break;
             case "+":
