@@ -337,6 +337,9 @@ export class GraphRenderer {
             console.log("Operation not valid");
             newSeries.datapoints[keyDatapoints][0] = 0;
           }
+          if (isNaN(newSeries.datapoints[keyDatapoints][0])) {
+            newSeries.datapoints[keyDatapoints][0] = 0;
+          }
 
           newSeries.data[keyDatapoints] = [];
           newSeries.data[keyDatapoints][0] = newSeries.datapoints[keyDatapoints][1];
