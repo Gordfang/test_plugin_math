@@ -335,6 +335,7 @@ export class GraphRenderer {
             newSeries.datapoints[keyDatapoints][0] = eval(operation);
           } catch (error) {
             console.log("Operation not valid");
+            newSeries.datapoints[keyDatapoints][0] = 0;
           }
 
           newSeries.data[keyDatapoints] = [];

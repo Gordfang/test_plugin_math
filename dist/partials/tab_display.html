@@ -95,24 +95,23 @@
 			</div>
 		</div>
 
-    <div class="section gf-form-group">
-      <h5 class="section-heading">Calcul</h5>
-      <div class="gf-form">
-        <label class="gf-form-label width-6">Operation</label>
-        <input type="text" class="gf-form-input max-width-20" ng-model="ctrl.panel.calcul.operation" ng-change="ctrl.render()" ng-model-onblur>
-      </div>
-      <gf-form-switch class="gf-form" label="Show alias" label-class="width-7" checked="ctrl.panel.calcul.show" on-change="ctrl.render()">
-      </gf-form-switch>
-      <div class="gf-form">
-        <label class="gf-form-label width-6">Name</label>
-        <input type="text" class="gf-form-input max-width-20" ng-model="ctrl.panel.calcul.name" ng-change="ctrl.render()" ng-model-onblur>
-      </div>
-      <div class="gf-form">
-        <label class="gf-form-label width-6">Color code</label>
-        <input type="text" class="gf-form-input max-width-20" ng-model="ctrl.panel.calcul.color" ng-change="ctrl.render()" ng-model-onblur>
-      </div>
-    </div>
-  </div>
+		<div class="section gf-form-group">
+			<h5 class="section-heading">Calcul</h5>
+			<div class="gf-form">
+				<label class="gf-form-label width-6">Operation</label>
+				<input type="text" class="gf-form-input max-width-20" ng-model="ctrl.panel.calcul.operation" ng-change="ctrl.render()" ng-model-onblur>
+			</div>
+			<gf-form-switch class="gf-form" label="Show details" label-class="width-7" checked="ctrl.panel.calcul.show" on-change="ctrl.render()">
+			</gf-form-switch>
+			<div class="gf-form">
+				<label class="gf-form-label width-6">Name</label>
+				<input type="text" class="gf-form-input max-width-20" ng-model="ctrl.panel.calcul.name" ng-change="ctrl.render()" ng-model-onblur>
+			</div>
+			<div class="gf-form">
+				<label class="gf-form-label width-6">Color code</label>
+				<input type="text" class="gf-form-input max-width-20" ng-model="ctrl.panel.calcul.color" ng-change="ctrl.render()" ng-model-onblur>
+			</div>
+		</div>
 	</div>
 
 	<div class="edit-tab-content" ng-if="ctrl.subTabIndex === 1">
